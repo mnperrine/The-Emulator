@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voice Transformer</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #ffffff;
+    --bg-secondary: #f7f6f3;
+    --bg-tertiary: #f0ede8;
+    --text: #1a1a1a;
+    --text-secondary: #6b6b6b;
+    --text-tertiary: #9b9b9b;
+    --border: rgba(0,0,0,0.12);
+    --border-mid: rgba(0,0,0,0.2);
+    --border-strong: rgba(0,0,0,0.35);
+    --accent: #1a1a1a;
+    --accent-fg: #ffffff;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-pill: 99px;
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    --font-serif: 'Georgia', 'Times New Roman', serif;
+    --font-mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1a1a;
+      --bg-secondary: #242424;
+      --bg-tertiary: #2e2e2e;
+      --text: #f0ede8;
+      --text-secondary: #a0a0a0;
+      --text-tertiary: #6b6b6b;
+      --border: rgba(255,255,255,0.1);
+      --border-mid: rgba(255,255,255,0.18);
+      --border-strong: rgba(255,255,255,0.3);
+      --accent: #f0ede8;
+      --accent-fg: #1a1a1a;
+    }
+  }
+
+  html, body {
+    min-height: 100vh;
+    background: var(--bg-tertiary);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .page {
+    max-width: 660px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 4rem;
+  }
+
+  .header { margin-bottom: 2.5rem; }
+
+  .header h1 {
+    font-size: 26px;
+    font-weight: 500;
+    letter-spacing: -0.4px;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .header p { font-size: 15px; color: var(--text-secondary); }
+
+  .card {
+    background: var(--bg);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .section-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-tertiary);
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 130px;
+    resize: vertical;
+    padding: 12px 14px;
+    font-size: 15px;
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-secondary);
+    color: var(--text);
+    transition: border-color 0.15s;
+  }
+
+  textarea:focus { outline: none; border-color: var(--border-strong); }
+  textarea::placeholder { color: var(--text-tertiary); }
+
+  .writers { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .writer-btn {
+    padding: 7px 15px;
+    border-radius: var(--radius-pill);
+    border: 0.5px solid var(--border-mid);
+    font-size: 13px;
+    font-family: var(--font-sans);
+    cursor: pointer;
+    background: transparent;
+    color: var(--text-secondary);
+    transition: all 0.15s;
+    line-height: 1;
+  }
+
+  .writer-btn:hover { border-color: var(--border-strong); color: var(--text); }
+
+  .writer-btn.active {
+    background: var(--accent);
+    color: var(--accent-fg);
+    border-color: var(--accent);
+  }
+
+  .writer-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 12px;
+    min-height: 2.4em;
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 6px;
+  }
+
+  input[type=range] {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--bg-tertiary);
+    outline: none;
+    border: 0.5px solid var(--border);
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: none;
+  }
+
+  input[type=range]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: none;
+  }
+
+  .slider-val {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    min-width: 32px;
+    text-align: right;
+  }
+
+  .slider-ends {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-tertiary);
+    margin-top: 2px;
+  }
+
+  .transform-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 24px;
+    background: var(--accent);
+    color: var(--accent-fg);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 15px;
+    font-weight: 500;
+    font-family: var(--font-sans);
+    cursor: pointer;
+    transition: opacity 0.15s;
+    width: 100%;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+
+  .transform-btn:hover { opacity: 0.85; }
+  .transform-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .spinner {
+    width: 15px;
+    height: 15px;
+    border: 1.5px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+
+  .transform-btn.loading .spinner { display: block; }
+  .transform-btn.loading .btn-text { opacity: 0.7; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .output-section { display: none; margin-top: 1rem; }
+  .output-section.visible { display: block; }
+
+  .output-card {
+    background: var(--bg);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+  }
+
+  .output-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .output-tag {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-tertiary);
+  }
+
+  .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    background: transparent;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 5px 10px;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    transition: all 0.15s;
+  }
+
+  .copy-btn:hover { color: var(--text); border-color: var(--border-mid); }
+
+  .output-text {
+    font-size: 16px;
+    line-height: 1.8;
+    color: var(--text);
+    font-family: var(--font-serif);
+    white-space: pre-wrap;
+  }
+
+  .error-box {
+    display: none;
+    background: #fff5f5;
+    border: 0.5px solid #fca5a5;
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    font-size: 13px;
+    color: #b91c1c;
+    margin-top: 0.75rem;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .error-box { background: #2d1515; border-color: #7f1d1d; color: #fca5a5; }
+  }
+
+  .error-box.visible { display: block; }
+
+  svg.icon {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vertical-align: -3px;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <h1>Voice transformer</h1>
+    <p>Paste any text. Pick a writer. Watch it get possessed.</p>
+  </div>
+
+  <div class="card">
+    <span class="section-label">Your text</span>
+    <textarea id="input-text" placeholder="Just got back from the grocery store. They were out of oat milk again. I genuinely cannot."></textarea>
+  </div>
+
+  <div class="card">
+    <span class="section-label">Voice</span>
+    <div class="writers">
+      <button class="writer-btn active" data-writer="Emily Dickinson">Emily Dickinson</button>
+      <button class="writer-btn" data-writer="Edgar Allan Poe">Edgar Allan Poe</button>
+      <button class="writer-btn" data-writer="William Faulkner">William Faulkner</button>
+      <button class="writer-btn" data-writer="Walt Whitman">Walt Whitman</button>
+      <button class="writer-btn" data-writer="Charlotte Brontë">Charlotte Brontë</button>
+      <button class="writer-btn" data-writer="Mark Twain">Mark Twain</button>
+      <button class="writer-btn" data-writer="Friedrich Nietzsche">Friedrich Nietzsche</button>
+    </div>
+    <div class="writer-desc" id="writer-desc">Compression. Capitalized abstractions. The dash as suspension. Everything is about dying or infinity, even the oat milk.</div>
+  </div>
+
+  <div class="card">
+    <span class="section-label">Intensity</span>
+    <div class="slider-row">
+      <input type="range" min="1" max="5" value="3" step="1" id="intensity" />
+      <div class="slider-val"><span id="intensity-out">3</span>/5</div>
+    </div>
+    <div class="slider-ends">
+      <span>Subtle whisper</span>
+      <span>Full possession</span>
+    </div>
+  </div>
+
+  <button class="transform-btn" id="transform-btn">
+    <svg class="spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+    <span class="btn-text">Transform</span>
+  </button>
+
+  <div class="error-box" id="error-box"></div>
+
+  <div class="output-section" id="output-section">
+    <div class="output-card">
+      <div class="output-header">
+        <span class="output-tag" id="output-tag">Emily Dickinson — level 3</span>
+        <button class="copy-btn" id="copy-btn">
+          <svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <div class="output-text" id="output-text"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const writerDescriptions = {
+    'Emily Dickinson': 'Compression. Capitalized abstractions. The dash as suspension. Everything is about dying or infinity, even the oat milk.',
+    'Edgar Allan Poe': 'Baroque, escalating dread. Long sentences delay the awful thing. The narrator is always one paragraph from collapse.',
+    'William Faulkner': 'Run-on sentences that fold back on themselves. Time is not linear. The past is never past, especially at the grocery store.',
+    'Walt Whitman': 'Catalogs. Lists. Every American worker, blade of grass, and body part before he\'s done. Expansive where Dickinson is contracted.',
+    'Charlotte Brontë': 'First-person confessional heat. She argues for her own feelings. Passionate but disciplined. Moral indignation in elegant prose.',
+    'Mark Twain': 'Vernacular rhythm and deadpan wit. He sounds like someone talking, not writing. Folksy on the surface, quietly savage underneath.',
+    'Friedrich Nietzsche': 'Aphoristic and hammer-wielding. He doesn\'t argue — he pronounces. Rhetorical questions that aren\'t really questions. Everything is a diagnosis of weakness or a call to become what you are.'
+  };
+
+  const writerPrompts = {
+    'Emily Dickinson': 'You write in the voice of Emily Dickinson. Use her hallmark compression, capitalized abstractions (Death, Eternity, Circumference, the Soul), unconventional em dashes for breath and suspension, slant rhyme when the text allows, and short lines with existential weight. Everything should feel slightly about dying or infinity, even mundane observations.',
+    'Edgar Allan Poe': 'You write in the voice of Edgar Allan Poe. Use baroque, escalating dread. Build with long periodic sentences that delay the awful thing. Use heightened, archaic diction. The narrator should feel one paragraph from complete psychological collapse. Em dashes and semicolons for mounting tension.',
+    'William Faulkner': 'You write in the voice of William Faulkner. Use long, winding run-on sentences that fold back on themselves. Southern landscape and memory as psychological weight. Time is not linear — the past intrudes on the present. Deeply interior. The dash and the comma carry enormous freight.',
+    'Walt Whitman': 'You write in the voice of Walt Whitman. Use expansive catalogs and lists. Celebrate the particular and the universal in the same breath. The em dash as invitation, not interruption. Free verse rhythm. Name everything — types of people, sensations, places. "I contain multitudes" is a structural approach, not a metaphor.',
+    'Charlotte Brontë': 'You write in the voice of Charlotte Brontë. First-person confessional heat. The narrator argues for her own feelings, often against social pressure. Passionate but disciplined prose. Moral indignation barely contained in elegant sentences. The reader is addressed with directness and vulnerability.',
+    'Mark Twain': 'You write in the voice of Mark Twain. Use the rhythms of spoken American vernacular — folksy, conversational, deceptively simple. Dry wit and comic timing carried by the sentence itself. Understated irony. The narrator sounds like the smartest person in the room who\'s pretending not to be. Avoid florid language; plain words doing sharp work.',
+    'Friedrich Nietzsche': 'You write in the voice of Friedrich Nietzsche. Use short, aphoristic bursts alternating with longer pronouncements. Rhetorical questions that function as accusations. Imperatives and declarations rather than arguments. Italics for emphasis on key words. A sense that the author is diagnosing the reader\'s weakness while pointing toward something higher. Bold, hammer-stroke prose.'
+  };
+
+  const intensityDescriptions = {
+    1: 'Lightly inflect the prose with hints of this writer\'s sensibility — preserve most of the original meaning and structure.',
+    2: 'Gently shift the tone and vocabulary toward this writer\'s voice, with subtle stylistic choices.',
+    3: 'Clearly rewrite the text in this writer\'s voice — their style, rhythm, and punctuation should be recognizable.',
+    4: 'Commit fully to the writer\'s voice. Embrace their distinctive mannerisms, vocabulary, and structural habits aggressively.',
+    5: 'Complete stylistic possession. The original text is raw material only. Become the writer entirely — no restraint, full signature style, all idiosyncrasies at maximum.'
+  };
+
+  let selectedWriter = 'Emily Dickinson';
+
+  const intensitySlider = document.getElementById('intensity');
+  const intensityOut = document.getElementById('intensity-out');
+  const transformBtn = document.getElementById('transform-btn');
+  const outputSection = document.getElementById('output-section');
+  const outputText = document.getElementById('output-text');
+  const outputTag = document.getElementById('output-tag');
+  const copyBtn = document.getElementById('copy-btn');
+  const errorBox = document.getElementById('error-box');
+  const writerDesc = document.getElementById('writer-desc');
+
+  document.querySelectorAll('.writer-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.writer-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedWriter = btn.dataset.writer;
+      writerDesc.textContent = writerDescriptions[selectedWriter];
+    });
+  });
+
+  intensitySlider.addEventListener('input', () => {
+    intensityOut.textContent = intensitySlider.value;
+  });
+
+  transformBtn.addEventListener('click', async () => {
+    const inputText = document.getElementById('input-text').value.trim();
+    const intensity = parseInt(intensitySlider.value);
+
+    errorBox.classList.remove('visible');
+    errorBox.textContent = '';
+
+    if (!inputText) { showError('Add some text to transform.'); return; }
+
+    setLoading(true);
+    outputSection.classList.remove('visible');
+
+    const systemPrompt = `${writerPrompts[selectedWriter]}
+
+Intensity instruction: ${intensityDescriptions[intensity]}
+
+Return ONLY the transformed text. No preamble, no explanation, no quotation marks around the output. Just the transformed prose itself.`;
+
+    try {
+      const response = await fetch('/api/proxy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 1000,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: `Transform this text:\n\n${inputText}` }]
+        })
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error?.message || `API error ${response.status}`);
+      }
+
+      const data = await response.json();
+      const result = data.content?.[0]?.text || '';
+
+      outputText.textContent = result;
+      outputTag.textContent = `${selectedWriter} — level ${intensity}`;
+      outputSection.classList.add('visible');
+      outputSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    } catch (err) {
+      showError(err.message || 'Something went wrong. Try again.');
+    } finally {
+      setLoading(false);
+    }
+  });
+
+  copyBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(outputText.textContent).then(() => {
+      copyBtn.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Copied';
+      setTimeout(() => {
+        copyBtn.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
+      }, 1500);
+    });
+  });
+
+  function setLoading(state) {
+    transformBtn.disabled = state;
+    transformBtn.classList.toggle('loading', state);
+    transformBtn.querySelector('.btn-text').textContent = state ? 'Transforming…' : 'Transform';
+  }
+
+  function showError(msg) {
+    errorBox.textContent = msg;
+    errorBox.classList.add('visible');
+  }
+</script>
+</body>
+</html>
