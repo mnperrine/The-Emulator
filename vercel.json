@@ -4,22 +4,3 @@
     { "source": "/(.*)", "destination": "/public/$1" }
   ]
 }
-Then save it: Command + S. Close TextEdit.
-
-What you just did (plain English):
-
-That file is just a set of instructions that tells Vercel how to route traffic. It's saying: "if someone visits /api/anything, send them to the api folder. If they visit anything else, send them to the public folder where the HTML lives." You never need to touch this file again.
-
-Back in Terminal, verify everything looks right:
-
-bash
-ls
-That lists everything in your current folder. You should see:
-
-api          node_modules     package.json
-public       package-lock.json     vercel.json
-Do you see all of those? If yes, we're ready for the proxy function.
-
-
-
-
