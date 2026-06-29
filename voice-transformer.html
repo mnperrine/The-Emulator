@@ -3,365 +3,352 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Voice Transformer</title>
+<title>The Emulator</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg: #ffffff;
-    --bg-secondary: #f7f6f3;
-    --bg-tertiary: #f0ede8;
-    --text: #1a1a1a;
-    --text-secondary: #6b6b6b;
-    --text-tertiary: #9b9b9b;
-    --border: rgba(0,0,0,0.12);
-    --border-mid: rgba(0,0,0,0.2);
-    --border-strong: rgba(0,0,0,0.35);
-    --accent: #1a1a1a;
-    --accent-fg: #ffffff;
-    --radius-md: 8px;
-    --radius-lg: 12px;
-    --radius-pill: 99px;
-    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-    --font-serif: 'Georgia', 'Times New Roman', serif;
-    --font-mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #1a1a1a;
-      --bg-secondary: #242424;
-      --bg-tertiary: #2e2e2e;
-      --text: #f0ede8;
-      --text-secondary: #a0a0a0;
-      --text-tertiary: #6b6b6b;
-      --border: rgba(255,255,255,0.1);
-      --border-mid: rgba(255,255,255,0.18);
-      --border-strong: rgba(255,255,255,0.3);
-      --accent: #f0ede8;
-      --accent-fg: #1a1a1a;
-    }
+    --white: #111111;
+    --off-white: #1a1a1a;
+    --black: #f0f0f0;
+    --mid: #888888;
+    --light: #444444;
+    --lighter: #2a2a2a;
+    --font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --font-serif: Georgia, 'Times New Roman', serif;
   }
 
   html, body {
-    min-height: 100vh;
-    background: var(--bg-tertiary);
-    color: var(--text);
-    font-family: var(--font-sans);
-    font-size: 16px;
-    line-height: 1.6;
+    background: var(--white);
+    color: var(--black);
+    font-family: var(--font);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
   }
 
   .page {
-    max-width: 660px;
+    max-width: 720px;
     margin: 0 auto;
-    padding: 3rem 1.5rem 4rem;
+    padding: 3rem 2rem 5rem;
   }
 
-  .header { margin-bottom: 2.5rem; }
-
-  .header h1 {
-    font-size: 26px;
+  /* ── SECTION LABELS ── */
+  .label {
+    font-size: 10px;
     font-weight: 500;
-    letter-spacing: -0.4px;
-    color: var(--text);
-    margin-bottom: 6px;
-  }
-
-  .header p { font-size: 15px; color: var(--text-secondary); }
-
-  .card {
-    background: var(--bg);
-    border: 0.5px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .section-label {
-    font-size: 11px;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-tertiary);
-    margin-bottom: 10px;
+    letter-spacing: 0.14em;
+    color: var(--mid);
     display: block;
+    margin-bottom: 10px;
   }
+
+  /* ── INPUT ── */
+  .input-section { margin-bottom: 2rem; }
 
   textarea {
     width: 100%;
-    min-height: 130px;
+    min-height: 140px;
     resize: vertical;
-    padding: 12px 14px;
+    padding: 14px 16px;
     font-size: 15px;
-    font-family: var(--font-sans);
+    font-family: var(--font);
     line-height: 1.6;
-    border: 0.5px solid var(--border);
-    border-radius: var(--radius-md);
-    background: var(--bg-secondary);
-    color: var(--text);
-    transition: border-color 0.15s;
+    border: 1px solid var(--black);
+    border-radius: 0;
+    background: var(--white);
+    color: var(--black);
+    transition: border-color 0.1s;
+    appearance: none;
   }
 
-  textarea:focus { outline: none; border-color: var(--border-strong); }
-  textarea::placeholder { color: var(--text-tertiary); }
+  textarea:focus { outline: none; border-color: var(--black); }
+  textarea::placeholder { color: var(--light); }
 
-  .writers { display: flex; gap: 8px; flex-wrap: wrap; }
+  /* ── WRITERS ── */
+  .writers-section { margin-bottom: 2rem; }
+
+  .writers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    border: 1px solid var(--black);
+  }
 
   .writer-btn {
-    padding: 7px 15px;
-    border-radius: var(--radius-pill);
-    border: 0.5px solid var(--border-mid);
-    font-size: 13px;
-    font-family: var(--font-sans);
+    flex: 1;
+    padding: 9px 8px;
+    font-size: 10px;
+    font-weight: 500;
+    font-family: var(--font);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
     cursor: pointer;
-    background: transparent;
-    color: var(--text-secondary);
-    transition: all 0.15s;
+    background: var(--white);
+    color: var(--mid);
+    border: none;
+    border-right: 1px solid var(--black);
+    transition: all 0.1s;
     line-height: 1;
+    white-space: nowrap;
+    text-align: center;
   }
 
-  .writer-btn:hover { border-color: var(--border-strong); color: var(--text); }
+  .writer-btn:last-child { border-right: none; }
+
+  .writer-btn:hover {
+    background: var(--off-white);
+    color: var(--black);
+  }
 
   .writer-btn.active {
-    background: var(--accent);
-    color: var(--accent-fg);
-    border-color: var(--accent);
+    background: var(--black);
+    color: var(--white);
   }
 
   .writer-desc {
-    font-size: 13px;
-    color: var(--text-secondary);
-    margin-top: 12px;
-    min-height: 2.4em;
+    font-size: 12px;
+    color: var(--mid);
+    margin-top: 10px;
     line-height: 1.5;
+    min-height: 2em;
     font-style: italic;
   }
 
-  .slider-row {
+  /* ── INTENSITY ── */
+  .intensity-section { margin-bottom: 2.5rem; }
+
+  .intensity-row {
     display: flex;
     align-items: center;
-    gap: 14px;
-    margin-bottom: 6px;
+    gap: 16px;
   }
 
   input[type=range] {
     flex: 1;
     -webkit-appearance: none;
     appearance: none;
-    height: 4px;
-    border-radius: 2px;
-    background: var(--bg-tertiary);
+    height: 1px;
+    background: var(--black);
     outline: none;
-    border: 0.5px solid var(--border);
+    border: none;
+    cursor: pointer;
   }
 
   input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: var(--accent);
+    width: 14px;
+    height: 14px;
+    background: var(--black);
+    border-radius: 0;
     cursor: pointer;
     border: none;
   }
 
   input[type=range]::-moz-range-thumb {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: var(--accent);
+    width: 14px;
+    height: 14px;
+    background: var(--black);
+    border-radius: 0;
     cursor: pointer;
     border: none;
   }
 
-  .slider-val {
-    font-size: 14px;
+  .intensity-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+  }
+
+  .intensity-labels span {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--mid);
+  }
+
+  .intensity-val {
+    font-size: 11px;
     font-weight: 500;
-    color: var(--text);
-    min-width: 32px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--black);
+    min-width: 36px;
     text-align: right;
   }
 
-  .slider-ends {
-    display: flex;
-    justify-content: space-between;
-    font-size: 11px;
-    color: var(--text-tertiary);
-    margin-top: 2px;
-  }
-
+  /* ── BUTTON ── */
   .transform-btn {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 11px 24px;
-    background: var(--accent);
-    color: var(--accent-fg);
-    border: none;
-    border-radius: var(--radius-md);
-    font-size: 15px;
-    font-weight: 500;
-    font-family: var(--font-sans);
-    cursor: pointer;
-    transition: opacity 0.15s;
-    width: 100%;
     justify-content: center;
-    margin-top: 0.5rem;
+    gap: 10px;
+    width: 100%;
+    padding: 14px 24px;
+    background: var(--black);
+    color: var(--white);
+    border: 1px solid var(--black);
+    font-size: 10px;
+    font-weight: 500;
+    font-family: var(--font);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    cursor: pointer;
+    transition: all 0.1s;
+    border-radius: 0;
   }
 
-  .transform-btn:hover { opacity: 0.85; }
-  .transform-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .transform-btn:hover {
+    background: var(--white);
+    color: var(--black);
+  }
+
+  .transform-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    background: var(--black);
+    color: var(--white);
+  }
 
   .spinner {
-    width: 15px;
-    height: 15px;
+    width: 12px;
+    height: 12px;
     border: 1.5px solid currentColor;
     border-top-color: transparent;
     border-radius: 50%;
     animation: spin 0.7s linear infinite;
     display: none;
+    flex-shrink: 0;
   }
 
   .transform-btn.loading .spinner { display: block; }
-  .transform-btn.loading .btn-text { opacity: 0.7; }
 
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  .output-section { display: none; margin-top: 1rem; }
-  .output-section.visible { display: block; }
-
-  .output-card {
-    background: var(--bg);
-    border: 0.5px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 1.5rem;
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: var(--lighter);
+    margin: 2.5rem 0;
   }
+
+  /* ── OUTPUT ── */
+  .output-section { display: none; }
+  .output-section.visible { display: block; }
 
   .output-header {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     justify-content: space-between;
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
   }
 
   .output-tag {
-    font-size: 11px;
+    font-size: 10px;
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-tertiary);
+    letter-spacing: 0.14em;
+    color: var(--black);
   }
 
   .copy-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 12px;
-    color: var(--text-secondary);
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--mid);
     background: transparent;
-    border: 0.5px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: 5px 10px;
+    border: none;
     cursor: pointer;
-    font-family: var(--font-sans);
-    transition: all 0.15s;
+    font-family: var(--font);
+    padding: 0;
+    transition: color 0.1s;
   }
 
-  .copy-btn:hover { color: var(--text); border-color: var(--border-mid); }
+  .copy-btn:hover { color: var(--black); }
 
   .output-text {
     font-size: 16px;
-    line-height: 1.8;
-    color: var(--text);
+    line-height: 1.85;
+    color: var(--black);
     font-family: var(--font-serif);
     white-space: pre-wrap;
+    border-left: 1px solid var(--black);
+    padding-left: 1.5rem;
   }
 
+  /* ── ERROR ── */
   .error-box {
     display: none;
-    background: #fff5f5;
-    border: 0.5px solid #fca5a5;
-    border-radius: var(--radius-md);
-    padding: 12px 14px;
-    font-size: 13px;
-    color: #b91c1c;
-    margin-top: 0.75rem;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    .error-box { background: #2d1515; border-color: #7f1d1d; color: #fca5a5; }
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--black);
+    border: 1px solid var(--black);
+    padding: 10px 14px;
+    margin-top: 1rem;
   }
 
   .error-box.visible { display: block; }
 
-  svg.icon {
-    width: 16px;
-    height: 16px;
-    stroke: currentColor;
-    fill: none;
-    stroke-width: 1.75;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    vertical-align: -3px;
+  /* ── MOBILE ── */
+  @media (max-width: 600px) {
+    .page { padding: 2rem 1.25rem 4rem; }
+    .writers { flex-direction: column; }
+    .writer-btn { border-right: none; border-bottom: 1px solid var(--black); }
+    .writer-btn:last-child { border-bottom: none; }
   }
 </style>
 </head>
 <body>
 <div class="page">
 
-  <div class="header">
-    <h1>Voice transformer</h1>
-    <p>Paste any text. Pick a writer. Watch it get possessed.</p>
+  <div class="input-section">
+    <span class="label">Your text</span>
+    <textarea id="input-text" placeholder="Paste anything. A tweet, an email, a grocery list. It doesn't matter."></textarea>
   </div>
 
-  <div class="card">
-    <span class="section-label">Your text</span>
-    <textarea id="input-text" placeholder="Just got back from the grocery store. They were out of oat milk again. I genuinely cannot."></textarea>
-  </div>
-
-  <div class="card">
-    <span class="section-label">Voice</span>
+  <div class="writers-section">
+    <span class="label">Voice</span>
     <div class="writers">
-      <button class="writer-btn active" data-writer="Emily Dickinson">Emily Dickinson</button>
-      <button class="writer-btn" data-writer="Edgar Allan Poe">Edgar Allan Poe</button>
-      <button class="writer-btn" data-writer="William Faulkner">William Faulkner</button>
-      <button class="writer-btn" data-writer="Walt Whitman">Walt Whitman</button>
-      <button class="writer-btn" data-writer="Charlotte Brontë">Charlotte Brontë</button>
-      <button class="writer-btn" data-writer="Mark Twain">Mark Twain</button>
-      <button class="writer-btn" data-writer="Friedrich Nietzsche">Friedrich Nietzsche</button>
+      <button class="writer-btn active" data-writer="Emily Dickinson">Dickinson</button>
+      <button class="writer-btn" data-writer="Edgar Allan Poe">Poe</button>
+      <button class="writer-btn" data-writer="William Faulkner">Faulkner</button>
+      <button class="writer-btn" data-writer="Walt Whitman">Whitman</button>
+      <button class="writer-btn" data-writer="Charlotte Brontë">Brontë</button>
+      <button class="writer-btn" data-writer="Mark Twain">Twain</button>
+      <button class="writer-btn" data-writer="Friedrich Nietzsche">Nietzsche</button>
     </div>
     <div class="writer-desc" id="writer-desc">Compression. Capitalized abstractions. The dash as suspension. Everything is about dying or infinity, even the oat milk.</div>
   </div>
 
-  <div class="card">
-    <span class="section-label">Intensity</span>
-    <div class="slider-row">
+  <div class="intensity-section">
+    <span class="label">Intensity</span>
+    <div class="intensity-row">
       <input type="range" min="1" max="5" value="3" step="1" id="intensity" />
-      <div class="slider-val"><span id="intensity-out">3</span>/5</div>
+      <div class="intensity-val" id="intensity-out">3 / 5</div>
     </div>
-    <div class="slider-ends">
-      <span>Subtle whisper</span>
-      <span>Full possession</span>
+    <div class="intensity-labels">
+      <span>Whisper</span>
+      <span>Possession</span>
     </div>
   </div>
 
   <button class="transform-btn" id="transform-btn">
-    <svg class="spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+    <div class="spinner"></div>
     <span class="btn-text">Transform</span>
   </button>
 
   <div class="error-box" id="error-box"></div>
 
   <div class="output-section" id="output-section">
-    <div class="output-card">
-      <div class="output-header">
-        <span class="output-tag" id="output-tag">Emily Dickinson — level 3</span>
-        <button class="copy-btn" id="copy-btn">
-          <svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-          Copy
-        </button>
-      </div>
-      <div class="output-text" id="output-text"></div>
+    <div class="divider"></div>
+    <div class="output-header">
+      <span class="output-tag" id="output-tag">Emily Dickinson — Level 3</span>
+      <button class="copy-btn" id="copy-btn">Copy</button>
     </div>
+    <div class="output-text" id="output-text"></div>
   </div>
 
 </div>
@@ -374,7 +361,7 @@
     'Walt Whitman': 'Catalogs. Lists. Every American worker, blade of grass, and body part before he\'s done. Expansive where Dickinson is contracted.',
     'Charlotte Brontë': 'First-person confessional heat. She argues for her own feelings. Passionate but disciplined. Moral indignation in elegant prose.',
     'Mark Twain': 'Vernacular rhythm and deadpan wit. He sounds like someone talking, not writing. Folksy on the surface, quietly savage underneath.',
-    'Friedrich Nietzsche': 'Aphoristic and hammer-wielding. He doesn\'t argue — he pronounces. Rhetorical questions that aren\'t really questions. Everything is a diagnosis of weakness or a call to become what you are.'
+    'Friedrich Nietzsche': 'Aphoristic and hammer-wielding. He doesn\'t argue — he pronounces. Everything is a diagnosis of weakness or a call to become what you are.'
   };
 
   const writerPrompts = {
@@ -417,7 +404,7 @@
   });
 
   intensitySlider.addEventListener('input', () => {
-    intensityOut.textContent = intensitySlider.value;
+    intensityOut.textContent = `${intensitySlider.value} / 5`;
   });
 
   transformBtn.addEventListener('click', async () => {
@@ -441,9 +428,7 @@ Return ONLY the transformed text. No preamble, no explanation, no quotation mark
     try {
       const response = await fetch('/api/proxy', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: 'claude-sonnet-4-6',
           max_tokens: 1000,
@@ -454,14 +439,14 @@ Return ONLY the transformed text. No preamble, no explanation, no quotation mark
 
       if (!response.ok) {
         const err = await response.json().catch(() => ({}));
-        throw new Error(err.error?.message || `API error ${response.status}`);
+        throw new Error(err.error?.message || `Error ${response.status}`);
       }
 
       const data = await response.json();
       const result = data.content?.[0]?.text || '';
 
       outputText.textContent = result;
-      outputTag.textContent = `${selectedWriter} — level ${intensity}`;
+      outputTag.textContent = `${selectedWriter} — Level ${intensity}`;
       outputSection.classList.add('visible');
       outputSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
@@ -474,17 +459,15 @@ Return ONLY the transformed text. No preamble, no explanation, no quotation mark
 
   copyBtn.addEventListener('click', () => {
     navigator.clipboard.writeText(outputText.textContent).then(() => {
-      copyBtn.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Copied';
-      setTimeout(() => {
-        copyBtn.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
-      }, 1500);
+      copyBtn.textContent = 'Copied';
+      setTimeout(() => { copyBtn.textContent = 'Copy'; }, 1500);
     });
   });
 
   function setLoading(state) {
     transformBtn.disabled = state;
     transformBtn.classList.toggle('loading', state);
-    transformBtn.querySelector('.btn-text').textContent = state ? 'Transforming…' : 'Transform';
+    transformBtn.querySelector('.btn-text').textContent = state ? 'Transforming' : 'Transform';
   }
 
   function showError(msg) {

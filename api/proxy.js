@@ -1,3 +1,25 @@
+const rateLimit = new Map();
+
+const LIMIT = 20;
+const WINDOW_MS = 60 * 60 * 1000; // 1 hour
+
+function checkRateLimit(ip) {
+  const now = Date.now();
+  const entry = rateLimit.get(ip);
+
+  if (!entry || now - entry.windowStart > WINDOW_MS) {
+    rateLimit.set(ip, { count: 1, windowStart: now });
+    return true;
+  }
+
+  if (entry.count >= LIMIT) {
+    return false;
+  }
+
+  entry.count++;
+  return true;
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -9,6 +31,12 @@ export default async function handler(req, res) {
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const ip = req.headers['x-forwarded-for']?.split(',')[0] || req.socket?.remoteAddress || 'unknown';
+
+  if (!checkRateLimit(ip)) {
+    return res.status(429).json({ error: 'Rate limit exceeded. Try again in an hour.' });
   }
 
   try {
