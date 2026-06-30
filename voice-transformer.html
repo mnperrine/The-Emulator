@@ -77,7 +77,8 @@
   }
 
   .writer-btn {
-    padding: 9px 16px;
+    flex: 1;
+    padding: 9px 8px;
     font-size: 10px;
     font-weight: 500;
     font-family: var(--font);
@@ -91,6 +92,7 @@
     transition: all 0.1s;
     line-height: 1;
     white-space: nowrap;
+    text-align: center;
   }
 
   .writer-btn:last-child { border-right: none; }
@@ -318,7 +320,7 @@
       <button class="writer-btn" data-writer="Mark Twain">Twain</button>
       <button class="writer-btn" data-writer="Friedrich Nietzsche">Nietzsche</button>
     </div>
-    <div class="writer-desc" id="writer-desc">Compression. Capitalized abstractions. The dash as suspension. Everything is about dying or infinity, even the oat milk.</div>
+    <div class="writer-desc" id="writer-desc">Compression — Death — Eternity — the dash itself as punctuation. Everything collapses inward. Even the mundane becomes a meditation on the infinite — or the void.</div>
   </div>
 
   <div class="intensity-section">
@@ -353,8 +355,8 @@
 
 <script>
   const writerDescriptions = {
-    'Emily Dickinson': 'ComCompression — Death — Eternity — the dash itself as punctuation. Everything collapses inward. Even the mundane becomes a meditation on the infinite — or the void.',
-    'Edgar Allan Poe': 'Dread — slow-building, baroque, inevitable. Each sentence delays the horror — then delays it again. The narrator is one revelation away from collapse — and they know it.'
+    'Emily Dickinson': 'Compression — Death — Eternity — the dash itself as punctuation. Everything collapses inward. Even the mundane becomes a meditation on the infinite — or the void.',
+    'Edgar Allan Poe': 'Dread — slow-building, baroque, inevitable. Each sentence delays the horror — then delays it again. The narrator is one revelation away from collapse — and they know it.',
     'William Faulkner': 'The past — never gone, never even past — folds back into the present without warning. Sentences sprawl, double back, contradict themselves — and hit home.',
     'Walt Whitman': 'Everything — every person, every blade of grass, every working hand — deserves to be named. The catalog is the poem. The list is the argument. ',
     'Charlotte Brontë': 'Feeling — fierce, disciplined, barely contained — argued for rather than simply expressed.',
