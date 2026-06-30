@@ -33,6 +33,18 @@
     padding: 3rem 2rem 5rem;
   }
 
+  .char-counter {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--mid);
+    text-align: right;
+    margin-top: 6px;
+    transition: color 0.15s;
+  }
+
+  .char-counter.warning { color: var(--black); }
+
   /* ── SECTION LABELS ── */
   .label {
     font-size: 10px;
@@ -259,14 +271,17 @@
     letter-spacing: 0.1em;
     color: var(--mid);
     background: transparent;
-    border: none;
+    border: 1px solid var(--mid);
     cursor: pointer;
     font-family: var(--font);
-    padding: 0;
-    transition: color 0.1s;
+    padding: 6px 12px;
+    transition: all 0.1s;
   }
 
-  .copy-btn:hover { color: var(--black); }
+  .copy-btn:hover {
+    color: var(--black);
+    border-color: var(--black);
+  }
 
   .output-text {
     font-size: 16px;
@@ -305,8 +320,9 @@
 <div class="page">
 
   <div class="input-section">
-    <span class="label"></span>
-    <textarea id="input-text" placeholder="Write here. A love note, an email, a declaration of war—anything."></textarea>
+    <span class="label">your "human" text</span>
+    <textarea id="input-text" maxlength="1000" placeholder="Write here. A love note, an email, a declaration of war—anything."></textarea>
+    <div class="char-counter"><span id="char-count">0</span> / 1000</div>
   </div>
 
   <div class="writers-section">
@@ -408,14 +424,24 @@
     intensityOut.textContent = `${intensitySlider.value} / 5`;
   });
 
+  const inputText = document.getElementById('input-text');
+  const charCount = document.getElementById('char-count');
+  const charCounter = document.querySelector('.char-counter');
+
+  inputText.addEventListener('input', () => {
+    const count = inputText.value.length;
+    charCount.textContent = count;
+    charCounter.classList.toggle('warning', count >= 900);
+  });
+
   transformBtn.addEventListener('click', async () => {
-    const inputText = document.getElementById('input-text').value.trim();
+    const text = inputText.value.trim();
     const intensity = parseInt(intensitySlider.value);
 
     errorBox.classList.remove('visible');
     errorBox.textContent = '';
 
-    if (!inputText) { showError('Add some text to transform.'); return; }
+    if (!inputText) { showError('Add some text to emulate.'); return; }
 
     setLoading(true);
     outputSection.classList.remove('visible');
@@ -434,7 +460,7 @@ Return ONLY the transformed text. No preamble, no explanation, no quotation mark
           model: 'claude-sonnet-4-6',
           max_tokens: 1000,
           system: systemPrompt,
-          messages: [{ role: 'user', content: `Transform this text:\n\n${inputText}` }]
+          messages: [{ role: 'user', content: `Transform this text:\n\n${text}` }]
         })
       });
 
