@@ -320,7 +320,7 @@
       <button class="writer-btn" data-writer="Mark Twain">Twain</button>
       <button class="writer-btn" data-writer="Friedrich Nietzsche">Nietzsche</button>
     </div>
-    <div class="writer-desc" id="writer-desc">Compression — Death — Eternity — the dash itself as punctuation. Everything collapses inward. Even the mundane becomes a meditation on the infinite — or the void.</div>
+    <div class="writer-desc" id="writer-desc"></div>
   </div>
 
   <div class="intensity-section">
@@ -393,6 +393,7 @@
   const copyBtn = document.getElementById('copy-btn');
   const errorBox = document.getElementById('error-box');
   const writerDesc = document.getElementById('writer-desc');
+  writerDesc.textContent = writerDescriptions[selectedWriter];
 
   document.querySelectorAll('.writer-btn').forEach(btn => {
     btn.addEventListener('click', () => {
