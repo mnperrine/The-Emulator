@@ -320,7 +320,7 @@
 <div class="page">
 
   <div class="input-section">
-    <span class="label">your "human" text</span>
+    <span class="label">Your "human" text</span>
     <textarea id="input-text" maxlength="1000" placeholder="Write here. A love note, an email, a declaration of war—anything."></textarea>
     <div class="char-counter"><span id="char-count">0</span> / 1000</div>
   </div>
@@ -494,7 +494,7 @@ Return ONLY the transformed text. No preamble, no explanation, no quotation mark
   function setLoading(state) {
     transformBtn.disabled = state;
     transformBtn.classList.toggle('loading', state);
-    transformBtn.querySelector('.btn-text').textContent = state ? 'Transforming' : 'Transform';
+    transformBtn.querySelector('.btn-text').textContent = state ? 'Emulating' : 'Emulate';
   }
 
   function showError(msg) {
