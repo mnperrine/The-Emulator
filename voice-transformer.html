@@ -19,7 +19,7 @@
   }
 
   html, body {
-    background: var(--white);
+    background: transparent;
     color: var(--black);
     font-family: var(--font);
     font-size: 15px;
@@ -77,7 +77,8 @@
   }
 
   .writer-btn {
-    padding: 9px 16px;
+    flex: 1;
+    padding: 9px 8px;
     font-size: 10px;
     font-weight: 500;
     font-family: var(--font);
@@ -91,6 +92,7 @@
     transition: all 0.1s;
     line-height: 1;
     white-space: nowrap;
+    text-align: center;
   }
 
   .writer-btn:last-child { border-right: none; }
@@ -318,7 +320,7 @@
       <button class="writer-btn" data-writer="Mark Twain">Twain</button>
       <button class="writer-btn" data-writer="Friedrich Nietzsche">Nietzsche</button>
     </div>
-    <div class="writer-desc" id="writer-desc">Compression. Capitalized abstractions. The dash as suspension. Everything is about dying or infinity, even the oat milk.</div>
+    <div class="writer-desc" id="writer-desc"></div>
   </div>
 
   <div class="intensity-section">
@@ -391,6 +393,7 @@
   const copyBtn = document.getElementById('copy-btn');
   const errorBox = document.getElementById('error-box');
   const writerDesc = document.getElementById('writer-desc');
+  writerDesc.textContent = writerDescriptions[selectedWriter];
 
   document.querySelectorAll('.writer-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -472,6 +475,20 @@ Return ONLY the transformed text. No preamble, no explanation, no quotation mark
     errorBox.textContent = msg;
     errorBox.classList.add('visible');
   }
+
+  // ── Report height to parent Squarespace page so the iframe can resize ──
+  function reportHeight() {
+    const height = document.documentElement.scrollHeight;
+    window.parent.postMessage({ type: 'emulator-height', height: height }, '*');
+  }
+
+  // Report on load
+  window.addEventListener('load', reportHeight);
+
+  // Report whenever content changes size — covers output appearing/disappearing,
+  // errors showing, and text wrapping differently
+  const resizeObserver = new ResizeObserver(() => reportHeight());
+  resizeObserver.observe(document.body);
 </script>
 </body>
 </html>
